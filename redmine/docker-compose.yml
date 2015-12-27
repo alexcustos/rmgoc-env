@@ -1,0 +1,35 @@
+# /var/www/redmine.example.com/docker-compose.yml
+
+redmine:
+  image: quay.io/sameersbn/redmine:3.2.0-2
+  # Автоматически запускать при старте системы и перезапускать в случае падения
+  restart: always
+  environment:
+    - TZ=Europe/Moscow
+    # Использовать в контейнере uid:gid локального пользователя, чтобы 
+    # владелец файлов, на хосте в смонтированных томах, был предсказуем.
+    - USERMAP_UID=[NGINX_UID]
+    - USERMAP_GID=[NGINX_GID]
+    - DB_TYPE=postgres
+    # Docker-у требуется существенное время, чтобы поднять bridge IP (172.17.0.1), и лучше
+    # с ним не связывать сервисы запускаемые при старте системы. Выставлять сервис наружу,
+    # без крайней необходимости, тоже плохая идея. Можно добавить на сетевой интерфес IP,
+    # который не маршрутизируется наружу и обращаться к нему из контейнеров.
+    - DB_HOST=10.0.10.10
+    - DB_USER=redmine
+    - DB_PASS=[ПАРОЛЬ]
+    - DB_NAME=redmine_production
+    - REDMINE_HTTPS=true
+    - REDMINE_PORT=10083
+    - SMTP_ENABLED=true
+    - SMTP_OPENSSL_VERIFY_MODE=none
+    # Локальная MTA доверяет подсети Docker-а 172.17.0.0/16, что в данном случае приемлемо.
+    - SMTP_HOST=[ВНЕШНИЙ_IP]
+    - SMTP_PORT=25
+    - IMAP_ENABLED=false
+  ports:
+    - "127.0.0.1:10083:80"
+  volumes:
+    - /var/www/redmine.example.com/data:/home/redmine/data
+    # Чтобы далеко не ходить за логами.
+    - /var/www/redmine.example.com/logs:/var/log/redmine

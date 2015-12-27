@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# /var/git/post-update
+
+# Запускается на сервере после того, как git push успешно отработает в локальном репозитории.
+
+REDMINE_GIT_DIR="/var/www/redmine.example.com/data/git"
+REPO_PATH=${PWD}
+REPO_NAME=$(basename "${REPO_PATH}")
+LOG_FILE="/var/log/nginx/git_hooks_log"
+
+function log_message()
+{
+	echo `date '+%d-%m-%y %H:%M:%S'` "$1" >>"${LOG_FILE}"
+}
+
+if [ -d "${REDMINE_GIT_DIR}" ]; then
+	cd "${REDMINE_GIT_DIR}"
+	if [ -d "${REPO_NAME}" ]; then
+		# Если копия репозитория уже создана, загрузить изменения.
+		cd "${REPO_NAME}"
+		log_message "UPDATED: ${PWD}"
+		exec git fetch -q --all -p &>>"${LOG_FILE}"
+	else
+		# Иначе создать клон репозитория.
+		log_message "NEW: ${REPO_PATH} : ${REPO_NAME} : ${PWD}"
+		exec git clone -q --mirror ${REPO_PATH} ${REPO_NAME} &>>"${LOG_FILE}"
+	fi
+fi

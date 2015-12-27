@@ -1,0 +1,57 @@
+--- nginx-1.8.0.ebuild	2015-08-05 14:31:19.000000000 +0300
++++ nginx-1.8.0.ebuild.new	2015-08-07 08:19:35.899578187 +0300
+@@ -126,6 +126,12 @@
+ HTTP_MOGILEFS_MODULE_URI="http://www.grid.net.ru/nginx/download/nginx_mogilefs_module-${HTTP_MOGILEFS_MODULE_PV}.tar.gz"
+ HTTP_MOGILEFS_MODULE_WD="${WORKDIR}/nginx_mogilefs_module-${HTTP_MOGILEFS_MODULE_PV}"
+ 
++# http_auth_ldap (https://github.com/kvspb/nginx-auth-ldap, ??? license)
++HTTP_AUTH_LDAP_MODULE_PV="master"
++HTTP_AUTH_LDAP_MODULE_P="ngx_http_auth_ldap-${HTTP_AUTH_LDAP_MODULE_PV}"
++HTTP_AUTH_LDAP_MODULE_URI="https://github.com/kvspb/nginx-auth-ldap/archive/${HTTP_AUTH_LDAP_MODULE_PV}.tar.gz"
++HTTP_AUTH_LDAP_MODULE_WD="${WORKDIR}/nginx-auth-ldap-${HTTP_AUTH_LDAP_MODULE_PV}"
++
+ inherit eutils ssl-cert toolchain-funcs perl-module flag-o-matic user systemd versionator multilib
+ 
+ DESCRIPTION="Robust, small and high performance http and reverse proxy server"
+@@ -148,7 +154,8 @@
+ 	nginx_modules_http_security? ( ${HTTP_SECURITY_MODULE_URI} -> ${HTTP_SECURITY_MODULE_P}.tar.gz )
+ 	nginx_modules_http_push_stream? ( ${HTTP_PUSH_STREAM_MODULE_URI} -> ${HTTP_PUSH_STREAM_MODULE_P}.tar.gz )
+ 	nginx_modules_http_sticky? ( ${HTTP_STICKY_MODULE_URI} -> ${HTTP_STICKY_MODULE_P}.tar.bz2 )
+-	nginx_modules_http_mogilefs? ( ${HTTP_MOGILEFS_MODULE_URI} -> ${HTTP_MOGILEFS_MODULE_P}.tar.gz )"
++	nginx_modules_http_mogilefs? ( ${HTTP_MOGILEFS_MODULE_URI} -> ${HTTP_MOGILEFS_MODULE_P}.tar.gz )
++	nginx_modules_http_auth_ldap? ( ${HTTP_AUTH_LDAP_MODULE_URI} -> ${HTTP_AUTH_LDAP_MODULE_P}.tar.gz )"
+ 
+ LICENSE="BSD-2 BSD SSLeay MIT GPL-2 GPL-2+
+ 	nginx_modules_http_security? ( Apache-2.0 )
+@@ -180,7 +187,8 @@
+ 	http_push_stream
+ 	http_sticky
+ 	http_ajp
+-	http_mogilefs"
++	http_mogilefs
++	http_auth_ldap"
+ 
+ IUSE="aio debug +http +http-cache ipv6 libatomic luajit +pcre pcre-jit rtmp
+ selinux ssl userland_GNU vim-syntax"
+@@ -220,7 +228,8 @@
+ 	nginx_modules_http_auth_pam? ( virtual/pam )
+ 	nginx_modules_http_metrics? ( dev-libs/yajl )
+ 	nginx_modules_http_dav_ext? ( dev-libs/expat )
+-	nginx_modules_http_security? ( >=dev-libs/libxml2-2.7.8 dev-libs/apr-util www-servers/apache )"
++	nginx_modules_http_security? ( >=dev-libs/libxml2-2.7.8 dev-libs/apr-util www-servers/apache )
++	nginx_modules_http_auth_ldap? ( net-nds/openldap )"
+ RDEPEND="${CDEPEND}
+ 	selinux? ( sec-policy/selinux-nginx )
+ "
+@@ -440,6 +449,11 @@
+ 		myconf+=" --add-module=${HTTP_MOGILEFS_MODULE_WD}"
+ 	fi
+ 
++	if use nginx_modules_http_auth_ldap; then
++		http_enabled=1
++		myconf+=" --add-module=${HTTP_AUTH_LDAP_MODULE_WD}"
++	fi
++
+ 	if use http || use http-cache; then
+ 		http_enabled=1
+ 	fi

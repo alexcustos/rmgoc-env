@@ -1,0 +1,45 @@
+dn: dc=example,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+dc: example
+o: Example.com
+
+dn: ou=people,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: uid=example,ou=people,dc=example,dc=com
+cn: Example User
+givenName: User
+sn: Example
+uid: example
+uidNumber: 1001
+gidNumber: 1000
+homeDirectory: /var/www/example.com
+mail: example@example.com
+objectClass: top
+objectClass: posixAccount
+objectClass: shadowAccount
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+loginShell: /sbin/nologin
+userPassword: {SSHA}1zGVasPHdQ7LXhBJxzAOseflZiqlecKT
+
+dn: cn=manager,dc=example,dc=com
+cn: Manager
+objectClass: top
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+userPassword: {SSHA}KihawPs8IchHTS/Lc7aqKGd1rfkpEKyi
+
+dn: cn=developers,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: developers
+description: Developers
+uniqueMember: uid=example,ou=people,dc=example,dc=com

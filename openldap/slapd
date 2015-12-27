@@ -1,0 +1,8 @@
+# /etc/conf.d/slapd
+
+# Читать настройки из файла.
+#OPTS_CONF="-f /etc/openldap/slapd.conf"
+# Читать настройки из базы данных.
+OPTS_CONF="-F /etc/openldap/slapd.d"
+# Сервис доступен извне по протоколу ldaps; локально - ldap либо через сокет (%2f - так нужно).
+OPTS="${OPTS_CONF} -h 'ldaps://[ВНЕШНИЙ_IP]:636 ldap://127.0.0.1:389 ldapi://%2fvar%2frun%2fopenldap%2fslapd.sock'"
